@@ -1,0 +1,51 @@
+body {
+    background-color: #f8f9fa;
+    font-family: 'Arial', sans-serif;
+}
+
+h1 {
+    font-size: 2.5rem;
+}
+
+form {
+    background: #ffffff;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+form .btn {
+    background-color: #007bff;
+    border: none;
+}
+
+form .btn:hover {
+    background-color: #0056b3;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+p {
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* Logo Position */
+#logo {
+    font-size: 2rem;
+    font-weight: bold;
+    position: fixed;
+    top: 20px;
+    right: 30px;
+    color: #007bff;
+}
+
+/* Footer Style */
+.footer {
+    position: fixed;
+    bottom: 20px;
+    width: 100%;
+    color: #6c757d;
+    font-size: 1rem;
+}

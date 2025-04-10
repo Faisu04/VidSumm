@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vidsumm - Video Summarizer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <!-- Text Logo on top-right corner -->
+            <h1 class="text-primary" id="logo">Vidsumm</h1>
+        </div>
+        
+        <h1 class="text-center text-primary">🎥 Video Summarizer</h1>
+        <p class="text-center text-muted">Summarize YouTube videos or uploaded video files effortlessly!</p>
+        
+        <!-- Tabs for YouTube and Offline Video -->
+        <ul class="nav nav-tabs justify-content-center mb-4" id="summarizerTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="youtube-tab" data-bs-toggle="tab" data-bs-target="#youtube" type="button" role="tab" aria-controls="youtube" aria-selected="true">YouTube Summarizer</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="offline-tab" data-bs-toggle="tab" data-bs-target="#offline" type="button" role="tab" aria-controls="offline" aria-selected="false">Offline Video Summarizer</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="summarizerTabsContent">
+            <!-- YouTube Summarizer Tab -->
+            <div class="tab-pane fade show active" id="youtube" role="tabpanel" aria-labelledby="youtube-tab">
+                <form id="youtube-form" class="p-4 border rounded">
+                    <div class="mb-3">
+                        <label for="youtube-url" class="form-label">YouTube Video URL</label>
+                        <input type="url" class="form-control" id="youtube-url" placeholder="Enter YouTube video URL" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Summarize</button>
+                </form>
+                <div id="youtube-processing" class="mt-4 text-center d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Processing...</span>
+                    </div>
+                    <p class="mt-3">Summarizing your YouTube video... Please wait.</p>
+                </div>
+                <div id="youtube-result" class="mt-4 d-none">
+                    <h5 class="text-success">Summary:</h5>
+                    <p id="youtube-summary" class="border p-3 rounded bg-light"></p>
+                </div>
+            </div>
+
+            <!-- Offline Video Summarizer Tab -->
+            <div class="tab-pane fade" id="offline" role="tabpanel" aria-labelledby="offline-tab">
+                <form id="offline-form" class="p-4 border rounded" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="video-file" class="form-label">Upload Video File</label>
+                        <input type="file" class="form-control" id="video-file" accept=".mp4, .avi, .mkv, .mov" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Summarize</button>
+                </form>
+                <div id="offline-processing" class="mt-4 text-center d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Processing...</span>
+                    </div>
+                    <p class="mt-3">Processing your uploaded video... Please wait.</p>
+                </div>
+                <div id="offline-result" class="mt-4 d-none">
+                    <h5 class="text-success">Summary:</h5>
+                    <p id="offline-summary" class="border p-3 rounded bg-light"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+  <!-- Footer with Your Name -->
+    <div class="footer text-center mt-5">
+        <p class="text-muted">Created by Faisal & Rachit</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Handle YouTube Summarizer
+        document.getElementById('youtube-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const urlInput = document.getElementById('youtube-url');
+            const processingDiv = document.getElementById('youtube-processing');
+            const resultDiv = document.getElementById('youtube-result');
+            const summaryDiv = document.getElementById('youtube-summary');
+
+            resultDiv.classList.add('d-none');
+            processingDiv.classList.remove('d-none');
+
+            const response = await fetch('/summarize_youtube', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ youtube_url: urlInput.value }),
+            });
+
+            const data = await response.json();
+            processingDiv.classList.add('d-none');
+
+            if (response.ok) {
+                summaryDiv.textContent = data.summary;
+                resultDiv.classList.remove('d-none');
+            } else {
+                summaryDiv.textContent = `Error: ${data.error}`;
+                resultDiv.classList.remove('d-none');
+            }
+        });
+
+        // Handle Offline Video Summarizer
+        document.getElementById('offline-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('video-file');
+            const processingDiv = document.getElementById('offline-processing');
+            const resultDiv = document.getElementById('offline-result');
+            const summaryDiv = document.getElementById('offline-summary');
+
+            resultDiv.classList.add('d-none');
+            processingDiv.classList.remove('d-none');
+
+            const formData = new FormData();
+            formData.append('video', fileInput.files[0]);
+
+            const response = await fetch('/summarize_offline', {
+                method: 'POST',
+                body: formData,
+            });
+
+            const data = await response.json();
+            processingDiv.classList.add('d-none');
+
+            if (response.ok) {
+                summaryDiv.textContent = data.summary;
+                resultDiv.classList.remove('d-none');
+            } else {
+                summaryDiv.textContent = `Error: ${data.error}`;
+                resultDiv.classList.remove('d-none');
+            }
+        });
+    </script>
+</body>
+</html>
